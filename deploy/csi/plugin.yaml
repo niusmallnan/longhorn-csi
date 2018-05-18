@@ -78,7 +78,7 @@ spec:
             capabilities:
               add: ["SYS_ADMIN"]
             allowPrivilegeEscalation: true
-          image: quay.io/cephcsi/longhorn-plugin:v0.2.0
+          image: niusmallnan/longhorn-manager:dev
           args :
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
@@ -91,7 +91,7 @@ spec:
                   fieldPath: spec.nodeName
             - name: CSI_ENDPOINT
               value: unix://var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
-          imagePullPolicy: "IfNotPresent"
+          imagePullPolicy: "Always"
           volumeMounts:
             - name: plugin-dir
               mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
