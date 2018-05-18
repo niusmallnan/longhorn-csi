@@ -72,7 +72,7 @@ spec:
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
-        - name: csi-longhorn-plugin 
+        - name: csi-longhorn-plugin
           securityContext:
             privileged: true
             capabilities:
@@ -80,9 +80,11 @@ spec:
             allowPrivilegeEscalation: true
           image: niusmallnan/longhorn-manager:dev
           args :
+            - "longhorn-manager"
+            - "-d"
+            - "csi"
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
-            - "--v=5"
             - "--drivername=csi-longhorn-plugin"
           env:
             - name: NODE_ID
@@ -91,6 +93,8 @@ spec:
                   fieldPath: spec.nodeName
             - name: CSI_ENDPOINT
               value: unix://var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
+            - name: LONGHORN_BACKEND
+              value: "http://10.43.56.205:9500/v1"
           imagePullPolicy: "Always"
           volumeMounts:
             - name: plugin-dir

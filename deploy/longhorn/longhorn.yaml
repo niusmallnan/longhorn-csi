@@ -225,6 +225,7 @@ spec:
   ports:
   - port: 9500
     targetPort: 9500
+  clusterIP: 10.43.56.205
   sessionAffinity: ClientIP
 ---
 apiVersion: extensions/v1beta1
