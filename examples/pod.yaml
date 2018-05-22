@@ -14,3 +14,18 @@ spec:
      persistentVolumeClaim:
        claimName: csi-longhorn-pvc
        readOnly: false
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: web-server-test
+  name: web-server-test
+spec:
+  selector:
+    app: web-server-test
+  ports:
+  - port: 80
+    targetPort: 80
+  type: NodePort
