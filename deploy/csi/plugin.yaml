@@ -57,7 +57,6 @@ spec:
         app: csi-longhorn-plugin
     spec:
       serviceAccount: csi-longhorn-plugin
-      hostNetwork: true
       containers:
         - name: driver-registrar
           image: quay.io/k8scsi/driver-registrar:v0.2.0
@@ -88,7 +87,7 @@ spec:
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
             - "--drivername=csi-longhorn-plugin"
-            - "--manager-url=http://10.43.56.205:9500/v1"
+            - "--manager-url=http://longhorn-backend:9500/v1"
           env:
             - name: NODE_ID
               valueFrom:
