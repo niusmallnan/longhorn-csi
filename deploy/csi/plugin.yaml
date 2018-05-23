@@ -95,8 +95,8 @@ spec:
                   fieldPath: spec.nodeName
             - name: CSI_ENDPOINT
               value: unix://var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
-            - name: RANCHER_CLIENT_DEBUG
-              value: "true"
+            #- name: RANCHER_CLIENT_DEBUG
+            #  value: "true"
           imagePullPolicy: "Always"
           volumeMounts:
             - name: plugin-dir
