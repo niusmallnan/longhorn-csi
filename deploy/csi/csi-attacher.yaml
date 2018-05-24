@@ -13,18 +13,18 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: external-attacher-runner
 rules:
-  - apiGroups: [""]
-    resources: ["events"]
-    verbs: ["get", "list", "watch", "update"]
-  - apiGroups: [""]
-    resources: ["persistentvolumes"]
-    verbs: ["get", "list", "watch", "update"]
-  - apiGroups: [""]
-    resources: ["nodes"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["storage.k8s.io"]
-    resources: ["volumeattachments"]
-    verbs: ["get", "list", "watch", "update"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["volumeattachments"]
+  verbs: ["get", "list", "watch", "update"]
 
 ---
 kind: ClusterRoleBinding
@@ -32,9 +32,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: csi-attacher-role
 subjects:
-  - kind: ServiceAccount
-    name: csi-attacher
-    namespace: longhorn-system
+- kind: ServiceAccount
+  name: csi-attacher
+  namespace: longhorn-system
 roleRef:
   kind: ClusterRole
   name: external-attacher-runner
@@ -52,8 +52,8 @@ spec:
   selector:
     app: csi-attacher
   ports:
-    - name: dummy
-      port: 12345
+  - name: dummy
+    port: 12345
 
 ---
 kind: StatefulSet
@@ -71,20 +71,20 @@ spec:
     spec:
       serviceAccount: csi-attacher
       containers:
-        - name: csi-attacher
-          image: quay.io/k8scsi/csi-attacher:v0.2.0
-          args:
-            - "--v=5"
-            - "--csi-address=$(ADDRESS)"
-          env:
-            - name: ADDRESS
-              value: /var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
-          imagePullPolicy: "IfNotPresent"
-          volumeMounts:
-            - name: socket-dir
-              mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
+      - name: csi-attacher
+        image: quay.io/k8scsi/csi-attacher:v0.2.0
+        args:
+          - "--v=5"
+          - "--csi-address=$(ADDRESS)"
+        env:
+          - name: ADDRESS
+            value: /var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
+        imagePullPolicy: "IfNotPresent"
+        volumeMounts:
+          - name: socket-dir
+            mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
       volumes:
-        - name: socket-dir
-          hostPath:
-            path: /var/lib/kubelet/plugins/csi-longhorn-plugin
-            type: DirectoryOrCreate
+      - name: socket-dir
+        hostPath:
+          path: /var/lib/kubelet/plugins/csi-longhorn-plugin
+          type: DirectoryOrCreate

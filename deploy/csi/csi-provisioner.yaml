@@ -19,31 +19,31 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: external-provisioner-runner
 rules:
-  - apiGroups: [""]
-    resources: ["secrets"]
-    verbs: ["get", "list"]
-  - apiGroups: [""]
-    resources: ["persistentvolumes"]
-    verbs: ["get", "list", "watch", "create", "delete"]
-  - apiGroups: [""]
-    resources: ["persistentvolumeclaims"]
-    verbs: ["get", "list", "watch", "update"]
-  - apiGroups: ["storage.k8s.io"]
-    resources: ["storageclasses"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
-    resources: ["events"]
-    verbs: ["list", "watch", "create", "update", "patch"]
-    
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "list", "watch", "create", "delete"]
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["list", "watch", "create", "update", "patch"]
+
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: csi-provisioner-role
 subjects:
-  - kind: ServiceAccount
-    name: csi-provisioner
-    namespace: longhorn-system
+- kind: ServiceAccount
+  name: csi-provisioner
+  namespace: longhorn-system
 roleRef:
   kind: ClusterRole
   name: external-provisioner-runner
@@ -61,8 +61,8 @@ spec:
   selector:
     app: csi-provisioner
   ports:
-    - name: dummy
-      port: 12345
+  - name: dummy
+    port: 12345
 
 ---
 kind: StatefulSet
@@ -80,21 +80,21 @@ spec:
     spec:
       serviceAccount: csi-provisioner
       containers:
-        - name: csi-provisioner
-          image: quay.io/k8scsi/csi-provisioner:v0.2.0
-          args:
-            - "--provisioner=csi-longhorn-plugin"
-            - "--csi-address=$(ADDRESS)"
-            - "--v=5"
-          env:
-            - name: ADDRESS
-              value: /var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
-          imagePullPolicy: "IfNotPresent"
-          volumeMounts:
-            - name: socket-dir
-              mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
-      volumes:
+      - name: csi-provisioner
+        image: quay.io/k8scsi/csi-provisioner:v0.2.0
+        args:
+        - "--provisioner=csi-longhorn-plugin"
+        - "--csi-address=$(ADDRESS)"
+        - "--v=5"
+        env:
+        - name: ADDRESS
+          value: /var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
+        imagePullPolicy: "IfNotPresent"
+        volumeMounts:
         - name: socket-dir
-          hostPath:
-            path: /var/lib/kubelet/plugins/csi-longhorn-plugin
-            type: DirectoryOrCreate
+          mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
+      volumes:
+      - name: socket-dir
+        hostPath:
+          path: /var/lib/kubelet/plugins/csi-longhorn-plugin
+          type: DirectoryOrCreate
