@@ -86,7 +86,7 @@ spec:
         - "csi"
         - "--nodeid=$(NODE_ID)"
         - "--endpoint=$(CSI_ENDPOINT)"
-        - "--drivername=csi-longhorn-plugin"
+        - "--drivername=io.rancher.longhorn"
         - "--manager-url=http://longhorn-backend:9500/v1"
         env:
         - name: NODE_ID
