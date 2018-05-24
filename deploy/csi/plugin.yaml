@@ -65,14 +65,14 @@ spec:
         - "--csi-address=$(ADDRESS)"
         env:
         - name: ADDRESS
-          value: /var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
+          value: /var/lib/kubelet/plugins/io.rancher.longhorn/csi.sock
         - name: KUBE_NODE_NAME
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
         volumeMounts:
         - name: socket-dir
-          mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
+          mountPath: /var/lib/kubelet/plugins/io.rancher.longhorn
       - name: csi-longhorn-plugin
         securityContext:
           privileged: true
@@ -94,13 +94,13 @@ spec:
             fieldRef:
               fieldPath: spec.nodeName
         - name: CSI_ENDPOINT
-          value: unix://var/lib/kubelet/plugins/csi-longhorn-plugin/csi.sock
+          value: unix://var/lib/kubelet/plugins/io.rancher.longhorn/csi.sock
         #- name: RANCHER_CLIENT_DEBUG
         #  value: "true"
         imagePullPolicy: "Always"
         volumeMounts:
         - name: plugin-dir
-          mountPath: /var/lib/kubelet/plugins/csi-longhorn-plugin
+          mountPath: /var/lib/kubelet/plugins/io.rancher.longhorn
         - name: pods-mount-dir
           mountPath: /var/lib/kubelet/pods
           mountPropagation: "Bidirectional"
@@ -114,7 +114,7 @@ spec:
       volumes:
       - name: plugin-dir
         hostPath:
-          path: /var/lib/kubelet/plugins/csi-longhorn-plugin
+          path: /var/lib/kubelet/plugins/io.rancher.longhorn
           type: DirectoryOrCreate
       - name: pods-mount-dir
         hostPath:
@@ -122,7 +122,7 @@ spec:
           type: Directory
       - name: socket-dir
         hostPath:
-          path: /var/lib/kubelet/plugins/csi-longhorn-plugin
+          path: /var/lib/kubelet/plugins/io.rancher.longhorn
           type: DirectoryOrCreate
       - name: host-dev
         hostPath:
