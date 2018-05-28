@@ -21,11 +21,9 @@ kubernetes_version: v1.10.1-rancher2
 services:
   kube-api:
     extra_args:
-      allow-privileged: true
       feature-gates: MountPropagation=true
 
   kubelet:
     extra_args:
-      allow-privileged: true
       feature-gates: MountPropagation=true
 
