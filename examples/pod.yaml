@@ -14,7 +14,7 @@ spec:
   volumes:
    - name: mypvc
      persistentVolumeClaim:
-       claimName: csi-longhorn-pvc
+       claimName: longhorn-csi-pvc
        readOnly: false
 
 ---

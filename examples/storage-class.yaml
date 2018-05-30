@@ -1,7 +1,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: csi-longhorn
-provisioner: csi-longhorn-plugin
+   name: longhorn-csi
+provisioner: longhorn-csi-plugin
 parameters:
 reclaimPolicy: Delete

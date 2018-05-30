@@ -83,7 +83,7 @@ spec:
       - name: csi-provisioner
         image: quay.io/k8scsi/csi-provisioner:v0.2.0
         args:
-        - "--provisioner=csi-longhorn-plugin"
+        - "--provisioner=longhorn-csi-plugin"
         - "--csi-address=$(ADDRESS)"
         - "--v=5"
         env:
