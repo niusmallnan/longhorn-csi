@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: longhorn-testvol-deployment
+  labels:
+    app: longhorn-testvol
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: longhorn-testvol
+  template:
+    metadata:
+      labels:
+        app: longhorn-testvol
+    spec:
+      containers:
+      - name: longhorn-testvol
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+          volumeMounts:
+        - mountPath: /var/lib/www/html
+          name: mypvc
+      volumes:
+      - name: mypvc
+        persistentVolumeClaim:
+        claimName: longhorn-csi-pvc
+        readOnly: false
+
+
+
