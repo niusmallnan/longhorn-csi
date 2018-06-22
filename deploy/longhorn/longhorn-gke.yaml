@@ -21,7 +21,7 @@ rules:
   verbs:
   - "*"
 - apiGroups: [""]
-  resources: ["pods", "events", "persistentvolumes", "persistentvolumeclaims", "nodes", "proxy/nodes"]
+  resources: ["pods", "events", "persistentvolumes", "persistentvolumeclaims", "nodes", "proxy/nodes", "pods/log", "secrets"]
   verbs: ["*"]
 - apiGroups: ["apps"]
   resources: ["daemonsets"]
@@ -33,19 +33,7 @@ rules:
   resources: ["storageclasses"]
   verbs: ["*"]
 - apiGroups: ["longhorn.rancher.io"]
-  resources: ["nodes"]
-  verbs: ["*"]
-- apiGroups: ["longhorn.rancher.io"]
-  resources: ["volumes"]
-  verbs: ["*"]
-- apiGroups: ["longhorn.rancher.io"]
-  resources: ["engines"]
-  verbs: ["*"]
-- apiGroups: ["longhorn.rancher.io"]
-  resources: ["replicas"]
-  verbs: ["*"]
-- apiGroups: ["longhorn.rancher.io"]
-  resources: ["settings"]
+  resources: ["volumes", "engines", "replicas", "settings", "engineimages"]
   verbs: ["*"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -133,7 +121,26 @@ spec:
   scope: Namespaced
   version: v1alpha1
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    longhorn-manager: EngineImage
+  name: engineimages.longhorn.rancher.io
+spec:
+  group: longhorn.rancher.io
+  names:
+    kind: EngineImage
+    listKind: EngineImageList
+    plural: engineimages
+    shortNames:
+    - lhei
+    singular: engineimage
+  scope: Namespaced
+  version: v1alpha1
+
+---
+apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
   labels:
@@ -141,21 +148,17 @@ metadata:
   name: longhorn-manager
   namespace: longhorn-system
 spec:
+  selector:
+    matchLabels:
+      app: longhorn-manager
   template:
     metadata:
       labels:
         app: longhorn-manager
     spec:
-      initContainers:
-      - name: init-container
-        image: rancher/longhorn-engine:91aa784
-        command: ['sh', '-c', 'cp /usr/local/bin/* /data/']
-        volumeMounts:
-        - name: execbin
-          mountPath: /data/
       containers:
       - name: longhorn-manager
-        image: niusmallnan/longhorn-manager:dev
+        image: rancher/longhorn-manager:885b53a
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -164,9 +167,9 @@ spec:
         - -d
         - daemon
         - --engine-image
-        - rancher/longhorn-engine:91aa784
+        - rancher/longhorn-engine:99441d1
         - --manager-image
-        - niusmallnan/longhorn-manager:dev
+        - rancher/longhorn-manager:885b53a
         - --service-account
         - longhorn-service-account
         ports:
@@ -180,8 +183,6 @@ spec:
           mountPath: /var/run/
         - name: longhorn
           mountPath: /var/lib/rancher/longhorn/
-        - name: execbin
-          mountPath: /usr/local/bin/
         env:
         - name: POD_NAMESPACE
           valueFrom:
@@ -208,8 +209,6 @@ spec:
       - name: longhorn
         hostPath:
           path: /var/lib/rancher/longhorn/
-      - name: execbin
-        emptyDir: {}
       serviceAccountName: longhorn-service-account
 ---
 kind: Service
@@ -227,7 +226,7 @@ spec:
     targetPort: 9500
   sessionAffinity: ClientIP
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   labels:
@@ -236,6 +235,9 @@ metadata:
   namespace: longhorn-system
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: longhorn-ui
   template:
     metadata:
       labels:
@@ -243,7 +245,7 @@ spec:
     spec:
       containers:
       - name: longhorn-ui
-        image: rancher/longhorn-ui:6d74dfc
+        image: rancher/longhorn-ui:3138c52
         ports:
         - containerPort: 8000
         env:
@@ -263,15 +265,19 @@ spec:
   ports:
   - port: 80
     targetPort: 8000
-  type: LoadBalancer
+    nodePort: 31212
+  type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: longhorn-flexvolume-driver-deployer
   namespace: longhorn-system
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: longhorn-flexvolume-driver-deployer
   template:
     metadata:
       labels:
@@ -279,14 +285,14 @@ spec:
     spec:
       containers:
         - name: longhorn-flexvolume-driver-deployer
-          image: niusmallnan/longhorn-manager:dev
+          image: rancher/longhorn-manager:885b53a
           imagePullPolicy: Always
           command:
           - longhorn-manager
           - -d
           - deploy-flexvolume-driver
           - --manager-image
-          - niusmallnan/longhorn-manager:dev
+          - rancher/longhorn-manager:885b53a
           env:
           - name: POD_NAMESPACE
             valueFrom:
@@ -299,4 +305,3 @@ spec:
           - name: FLEXVOLUME_DIR
             value: "/home/kubernetes/flexvolume/"
       serviceAccountName: longhorn-service-account
----

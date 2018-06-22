@@ -79,7 +79,7 @@ spec:
           capabilities:
             add: ["SYS_ADMIN"]
           allowPrivilegeEscalation: true
-        image: niusmallnan/longhorn-manager:dev
+        image: rancher/longhorn-manager:885b53a
         args :
         - "longhorn-manager"
         - "-d"
