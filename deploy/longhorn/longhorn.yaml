@@ -21,7 +21,7 @@ rules:
   verbs:
   - "*"
 - apiGroups: [""]
-  resources: ["pods", "events", "persistentvolumes", "persistentvolumeclaims", "nodes", "proxy/nodes", "pods/log", "secrets", "serviceaccounts", "services"]
+  resources: ["pods", "events", "persistentvolumes", "persistentvolumeclaims", "nodes", "proxy/nodes", "pods/log", "secrets", "services"]
   verbs: ["*"]
 - apiGroups: [""]
   resources: ["namespaces"]
@@ -31,9 +31,6 @@ rules:
   verbs: ["*"]
 - apiGroups: ["batch"]
   resources: ["jobs", "cronjobs"]
-  verbs: ["*"]
-- apiGroups: ["rbac.authorization.k8s.io"]
-  resources: ["roles", "rolebindings"]
   verbs: ["*"]
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses", "volumeattachments"]
@@ -334,4 +331,6 @@ spec:
             value: "/var/lib/kubelet/volumeplugins"
             # For default or auto detection with Kubernetes <= v1.9
             #value: ""
+            # For GKE
+            #value: "/home/kubernetes/flexvolume/"
       serviceAccountName: longhorn-service-account
