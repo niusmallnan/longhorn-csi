@@ -23,6 +23,9 @@ rules:
 - apiGroups: [""]
   resources: ["pods", "events", "persistentvolumes", "persistentvolumeclaims", "nodes", "proxy/nodes", "pods/log", "secrets", "serviceaccounts", "services"]
   verbs: ["*"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list"]
 - apiGroups: ["apps"]
   resources: ["daemonsets", "statefulsets"]
   verbs: ["*"]
@@ -33,7 +36,7 @@ rules:
   resources: ["roles", "rolebindings"]
   verbs: ["*"]
 - apiGroups: ["storage.k8s.io"]
-  resources: ["storageclasses"]
+  resources: ["storageclasses", "volumeattachments"]
   verbs: ["*"]
 - apiGroups: ["longhorn.rancher.io"]
   resources: ["volumes", "engines", "replicas", "settings", "engineimages", "nodes"]
@@ -322,6 +325,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
+          - name: SERVICE_ACCOUNT
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.serviceAccountName
           - name: FLEXVOLUME_DIR
             value: ""
       serviceAccountName: longhorn-service-account
