@@ -184,7 +184,7 @@ spec:
         - -d
         - daemon
         - --engine-image
-        - rancher/longhorn-engine:99441d1
+        - rancher/longhorn-engine:31c42f0
         - --manager-image
         - niusmallnan/longhorn-manager:dev
         - --service-account
@@ -262,7 +262,7 @@ spec:
     spec:
       containers:
       - name: longhorn-ui
-        image: rancher/longhorn-ui:3138c52
+        image: rancher/longhorn-ui:23e53f0
         ports:
         - containerPort: 8000
         env:
