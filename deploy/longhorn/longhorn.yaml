@@ -307,7 +307,7 @@ spec:
           command:
           - longhorn-manager
           - -d
-          - deploy-flexvolume-driver
+          - deploy-driver
           - --manager-image
           - niusmallnan/longhorn-manager:dev
           env:
