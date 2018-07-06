@@ -21,13 +21,16 @@ rules:
   verbs:
   - "*"
 - apiGroups: [""]
-  resources: ["pods", "events", "persistentvolumes", "persistentvolumeclaims", "nodes", "proxy/nodes", "pods/log", "secrets"]
+  resources: ["pods", "events", "persistentvolumes", "persistentvolumeclaims", "nodes", "proxy/nodes", "pods/log", "secrets", "serviceaccounts", "services"]
   verbs: ["*"]
 - apiGroups: ["apps"]
-  resources: ["daemonsets"]
+  resources: ["daemonsets", "statefulsets"]
   verbs: ["*"]
 - apiGroups: ["batch"]
   resources: ["jobs", "cronjobs"]
+  verbs: ["*"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles", "rolebindings"]
   verbs: ["*"]
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses"]
