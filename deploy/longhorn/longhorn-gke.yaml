@@ -313,6 +313,8 @@ spec:
           - deploy-driver
           - --manager-image
           - niusmallnan/longhorn-manager:dev
+          - --manager-url
+          - http://longhorn-backend:9500/v1
           env:
           - name: POD_NAMESPACE
             valueFrom:
