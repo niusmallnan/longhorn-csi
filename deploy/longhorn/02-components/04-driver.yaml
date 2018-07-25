@@ -15,14 +15,14 @@ spec:
     spec:
       containers:
         - name: longhorn-driver-deployer
-          image: rancher/longhorn-manager:9b29b88
+          image: niusmallnan/longhorn-manager:dev
           imagePullPolicy: Always
           command:
           - longhorn-manager
           - -d
           - deploy-driver
           - --manager-image
-          - niusmallnan/longhorn-manager:9b29b88
+          - niusmallnan/longhorn-manager:dev
           - --manager-url
           - http://longhorn-backend:9500/v1
           # manually choose "flexvolume" or "csi"
