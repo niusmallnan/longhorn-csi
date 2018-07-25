@@ -11,4 +11,4 @@ kubectl -n longhorn-system delete  sts --all
 kubectl -n longhorn-system delete  ds --all
 
 
-kubectl delete -Rf longhorn.yaml
+kubectl delete -Rf longhorn/
