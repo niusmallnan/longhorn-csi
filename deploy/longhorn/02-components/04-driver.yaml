@@ -46,8 +46,9 @@ spec:
               fieldRef:
                 fieldPath: spec.serviceAccountName
           - name: FLEXVOLUME_DIR
-            # FOR RKE
             value: "/var/lib/kubelet/volumeplugins"
+            # FOR RKE
+            #value: "/var/lib/kubelet/volumeplugins"
             # FOR GKE
             #value: "/home/kubernetes/flexvolume/"
             # For default or auto detection with Kubernetes <= v1.8

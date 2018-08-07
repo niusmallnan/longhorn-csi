@@ -25,7 +25,7 @@ spec:
         - -d
         - daemon
         - --engine-image
-        - rancher/longhorn-engine:31c42f0
+        - rancher/longhorn-engine:e58683a
         - --manager-image
         - niusmallnan/longhorn-manager:dev
         - --service-account
@@ -41,6 +41,7 @@ spec:
           mountPath: /var/run/
         - name: longhorn
           mountPath: /var/lib/rancher/longhorn/
+          mountPropagation: Bidirectional
         env:
         - name: POD_NAMESPACE
           valueFrom:
