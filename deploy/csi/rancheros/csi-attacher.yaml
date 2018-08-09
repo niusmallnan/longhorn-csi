@@ -78,13 +78,13 @@ spec:
           - "--csi-address=$(ADDRESS)"
         env:
           - name: ADDRESS
-            value: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn/csi.sock
+            value: /var/lib/kubelet/plugins/io.rancher.longhorn/csi.sock
         imagePullPolicy: "IfNotPresent"
         volumeMounts:
           - name: socket-dir
-            mountPath: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn
+            mountPath: /var/lib/kubelet/plugins/io.rancher.longhorn
       volumes:
       - name: socket-dir
         hostPath:
-          path: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn
+          path: /var/lib/kubelet/plugins/io.rancher.longhorn
           type: DirectoryOrCreate
