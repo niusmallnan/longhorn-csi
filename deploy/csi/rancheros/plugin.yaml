@@ -1,0 +1,135 @@
+# This YAML defines all API objects to create RBAC roles for csi node plugin.
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: longhorn-csi-plugin
+  namespace: longhorn-system
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: longhorn-csi-plugin
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "update"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["volumeattachments"]
+  verbs: ["get", "list", "watch", "update"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: longhorn-csi-plugin
+subjects:
+- kind: ServiceAccount
+  name: longhorn-csi-plugin
+  namespace: longhorn-system
+roleRef:
+  kind: ClusterRole
+  name: longhorn-csi-plugin
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# This YAML file contains driver-registrar & csi driver nodeplugin API objects,
+# which are necessary to run csi nodeplugin for longhorn.
+
+kind: DaemonSet
+apiVersion: apps/v1beta2
+metadata:
+  name: longhorn-csi-plugin
+  namespace: longhorn-system
+spec:
+  selector:
+    matchLabels:
+      app: longhorn-csi-plugin
+  template:
+    metadata:
+      labels:
+        app: longhorn-csi-plugin
+    spec:
+      serviceAccount: longhorn-csi-plugin
+      containers:
+      - name: driver-registrar
+        image: quay.io/k8scsi/driver-registrar:v0.2.0
+        args:
+        - "--v=5"
+        - "--csi-address=$(ADDRESS)"
+        env:
+        - name: ADDRESS
+          value: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn/csi.sock
+        - name: KUBE_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - name: socket-dir
+          mountPath: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn
+      - name: longhorn-csi-plugin
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["SYS_ADMIN"]
+          allowPrivilegeEscalation: true
+        image: niusmallnan/longhorn-manager:dev
+        args :
+        - "longhorn-manager"
+        - "-d"
+        - "csi"
+        - "--nodeid=$(NODE_ID)"
+        - "--endpoint=$(CSI_ENDPOINT)"
+        - "--drivername=io.rancher.longhorn"
+        - "--manager-url=http://longhorn-backend:9500/v1"
+        env:
+        - name: NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: CSI_ENDPOINT
+          value: unix://opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn/csi.sock
+        #- name: RANCHER_CLIENT_DEBUG
+        #  value: "true"
+        imagePullPolicy: "Always"
+        volumeMounts:
+        - name: plugin-dir
+          mountPath: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn
+        - name: pods-mount-dir
+          mountPath: /opt/rke/var/lib/kubelet/pods
+          mountPropagation: "Bidirectional"
+        - mountPath: /dev
+          name: host-dev
+        - mountPath: /sys
+          name: host-sys
+        - mountPath: /lib/modules
+          name: lib-modules
+          readOnly: true
+      volumes:
+      - name: plugin-dir
+        hostPath:
+          path: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn
+          type: DirectoryOrCreate
+      - name: pods-mount-dir
+        hostPath:
+          path: /opt/rke/var/lib/kubelet/pods
+          type: Directory
+      - name: socket-dir
+        hostPath:
+          path: /opt/rke/var/lib/kubelet/plugins/io.rancher.longhorn
+          type: DirectoryOrCreate
+      - name: host-dev
+        hostPath:
+          path: /dev
+      - name: host-sys
+        hostPath:
+          path: /sys
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
