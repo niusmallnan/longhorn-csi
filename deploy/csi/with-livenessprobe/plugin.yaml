@@ -126,13 +126,13 @@ spec:
           readOnly: true
       - name: liveness-probe
         imagePullPolicy: Always
-        volumeMounts:
-        - mountPath: /csi
-          name: socket-dir
-        image: quay.io/k8scsi/livenessprobe:v0.2.0
+        image: quay.io/k8scsi/livenessprobe
         args:
         - --csi-address=/var/lib/kubelet/plugins/io.rancher.longhorn/csi.sock
         - --connection-timeout=3s
+        volumeMounts:
+        - name: socket-dir
+          mountPath: /var/lib/kubelet/plugins/io.rancher.longhorn
       volumes:
       - name: plugin-dir
         hostPath:
